@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.google.android.material.card.MaterialCardView
 import com.itunessearch.android.R
 import com.itunessearch.android.domain.model.Content
+import com.itunessearch.android.presentation.UiUtil
 import kotlinx.android.synthetic.main.content_list_item.view.*
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -34,7 +36,7 @@ class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when(holder) {
 
             is ContentViewHolder -> {
-                holder.bind(items.get(position))
+                holder.bind(items[position])
             }
         }
     }
@@ -60,45 +62,30 @@ class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         itemView: View
     ): RecyclerView.ViewHolder(itemView) {
 
-        val ivImage: ImageView = itemView.item_image
-        val tvName: TextView = itemView.item_name
-        val tvArtist: TextView = itemView.item_artist
-        val tvGenre: TextView = itemView.item_genre
-        val tvReleaseDate: TextView = itemView.item_release_date
-        val tvPrice: TextView = itemView.item_price
+        private val card: MaterialCardView = itemView.card;
+        private val ivImage: ImageView = itemView.item_image
+        private val tvName: TextView = itemView.item_name
+        private val tvArtist: TextView = itemView.item_artist
+        private val tvGenre: TextView = itemView.item_genre
+        private val tvReleaseDate: TextView = itemView.item_release_date
+        private val tvPrice: TextView = itemView.item_price
 
         fun bind(content: Content) {
-            tvName.text = content.trackName
-            tvArtist.text = content.artistName
+            UiUtil.setContentTextValues(
+                content,
+                tvName,
+                tvArtist,
+                tvGenre,
+                tvReleaseDate,
+                tvPrice,
+                null
+            )
 
-            val kind = content.kind?.let {
-                var displayTxt = it.value.replace("_", " ")
-                displayTxt = displayTxt.replace("-", " ")
-                displayTxt.toUpperCase()
+            UiUtil.displayImage(itemView.context, content.artworkUrl100, ivImage)
+
+            card.setOnClickListener {
+                Navigation.findNavController(itemView).navigate(R.id.action_mainFragment_to_detailFragment)
             }
-            val genre = content.primaryGenreName
-            tvGenre.text = "$kind - $genre"
-
-            val releasedDate = content.releaseDate
-            if (content.releaseDate == null) {
-                tvReleaseDate.visibility = View.GONE
-            }
-            else {
-                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                val cal = Calendar.getInstance()
-                cal.timeInMillis = simpleDateFormat.parse(releasedDate).time
-                tvReleaseDate.text = cal.get(Calendar.YEAR).toString()
-                tvReleaseDate.visibility = View.VISIBLE
-            }
-
-            val currency = content.currency ?: "AUD"
-            val price = content.trackPrice?.let { "%.2f".format(it) } ?: "0"
-            tvPrice.text = "$currency $price"
-
-            Glide.with(itemView.context)
-                .load(content.artworkUrl100)
-                .transition(DrawableTransitionOptions.withCrossFade(100))
-                .into(ivImage)
         }
     }
 

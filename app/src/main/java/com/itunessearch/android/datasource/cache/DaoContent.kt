@@ -9,7 +9,10 @@ interface DaoContent:
 
     // Order cache in descending so that cache items will be displayed starting from recent search.
     @Query("SELECT * FROM content ORDER BY id DESC LIMIT 50")
-    suspend fun get(): List<EntityCacheContent>
+    suspend fun getAll(): List<EntityCacheContent>
+
+    @Query("SELECT * FROM content ORDER BY id DESC LIMIT 1")
+    suspend fun get(): EntityCacheContent
 
     @Transaction
     suspend fun upsert(obj: EntityCacheContent) {

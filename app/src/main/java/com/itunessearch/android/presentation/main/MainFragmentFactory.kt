@@ -1,7 +1,8 @@
-package com.itunessearch.android.presentation
+package com.itunessearch.android.presentation.main
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import com.itunessearch.android.presentation.detail.DetailFragment
 import javax.inject.Inject
 
 class MainFragmentFactory
@@ -13,6 +14,9 @@ constructor(): FragmentFactory() {
         return when(className) {
             MainFragment::class.java.name -> {
                 MainFragment()
+            }
+            DetailFragment::class.java.name -> {
+                DetailFragment()
             }
             else -> super.instantiate(classLoader, className)
         }

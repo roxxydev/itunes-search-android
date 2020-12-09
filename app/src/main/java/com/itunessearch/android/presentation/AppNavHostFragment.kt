@@ -2,11 +2,12 @@ package com.itunessearch.android.presentation
 
 import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
+import com.itunessearch.android.presentation.main.MainFragmentFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainNavHostFragment: NavHostFragment() {
+class AppNavHostFragment: NavHostFragment() {
 
     @Inject
     lateinit var fragmentFactory: MainFragmentFactory

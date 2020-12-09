@@ -13,7 +13,8 @@ import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.domain.state.DataState.*
 import com.itunessearch.android.domain.state.MessageType
 import com.itunessearch.android.domain.state.StateMessage
-import com.itunessearch.android.presentation.MainDataState
+import com.itunessearch.android.presentation.main.MainDataState
+import com.itunessearch.android.presentation.detail.DetailDataState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -26,8 +27,15 @@ constructor(
     private val apiService: ApiServiceRetrofit,
     private val contentMapper: ContentMapper
 ) {
-    suspend fun getContents(term: String, media: Media): Flow<DataState<MainDataState>> = flow {
 
+    /**
+     * Return the list of Contents from ITunes Search API. Returned response from API will
+     * be saved to Room database and serves as cache data.
+     *
+     * @param term The text to search in ITunes Search API.
+     * @param media The type of Media to fetch.
+     */
+    suspend fun getContents(term: String, media: Media): Flow<DataState<MainDataState>> = flow {
         try {
             emit(LOADING(true))
 
@@ -36,20 +44,38 @@ constructor(
 
             daoContent.upsert(contentMapper.mapToCacheEntityList(contentsNetwork) as List<EntityCacheContent>)
 
-            val cacheData = daoContent.get()
+            val cacheData = daoContent.getAll()
             val contentsCache = contentMapper.mapFromCacheEntityList(cacheData)
 
-            if (contentsNetwork.isEmpty()) {
-                val stateMsg = StateMessage(appContext.getString(R.string.empty_results), MessageType.INFO)
-                emit(SUCCESS(MainDataState(null, media, term, contentsNetwork, contentsCache), stateMsg))
-            }
-            else {
-                emit(SUCCESS(MainDataState(null, media, term, contentsNetwork, contentsCache)))
-            }
+            emit(SUCCESS(
+                MainDataState(
+                    null,
+                    contentsNetwork,
+                    contentsCache)
+            ))
 
             emit(LOADING(false))
-        } catch (e: Exception) {
 
+        } catch (e: Exception) {
+            Timber.e(e)
+            val errorTxt = appContext.getString(R.string.error_message)
+            val stateMsg = StateMessage(errorTxt, MessageType.ERROR)
+            emit(ERROR(stateMsg))
+        }
+    }
+
+    /**
+     * Return the details of a Content from cache data.
+     */
+    suspend fun getContent(id: String): Flow<DataState<DetailDataState>> = flow {
+        try {
+            emit(LOADING(true))
+            val cacheData = daoContent.get()
+            val content = contentMapper.mapFromCacheEntity(cacheData)
+            emit(SUCCESS(DetailDataState(content)))
+            emit(LOADING(false))
+
+        } catch (e: Exception) {
             Timber.e(e)
             val errorTxt = appContext.getString(R.string.error_message)
             val stateMsg = StateMessage(errorTxt, MessageType.ERROR)

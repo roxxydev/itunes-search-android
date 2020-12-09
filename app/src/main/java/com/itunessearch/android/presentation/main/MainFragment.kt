@@ -1,9 +1,7 @@
-package com.itunessearch.android.presentation
+package com.itunessearch.android.presentation.main
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.widget.ListView
 import android.widget.Toast
@@ -15,25 +13,26 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import com.itunessearch.android.R
-import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
-import com.itunessearch.android.domain.state.MessageType
 import com.itunessearch.android.presentation.adapter.ContentRecyclerAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainFragment: Fragment(R.layout.fragment_main) {
 
     private val viewModel: MainViewModel by  viewModels()
     private lateinit var contentRecyclerAdapter: ContentRecyclerAdapter
+    private lateinit var topAppBar: MaterialToolbar
     private var searchView: SearchView? = null
     private var selectedFilter: Media = Media.ALL
 
@@ -42,7 +41,12 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
         initViews()
         subscribeObservers()
-        viewModel.setStateEvent(MainIntent.GetInitialContentsIntent(null, null))
+        viewModel.setStateEvent(
+            MainIntent.GetInitialContentsIntent(
+                null,
+                null
+            )
+        )
     }
 
     private fun subscribeObservers() {
@@ -58,9 +62,10 @@ class MainFragment: Fragment(R.layout.fragment_main) {
                         val isInitialLoad = it.isInitial ?: true
 
                         /*
-                            Display cache contents on initial start of app since
-                            api returns empty results for empty search term
+                         * Display cache contents on initial start of app since
+                         * api returns empty results for empty search term
                          */
+
                         when {
                             isInitialLoad -> {
                                 contentRecyclerAdapter.submitList(it.cacheContents)
@@ -68,9 +73,9 @@ class MainFragment: Fragment(R.layout.fragment_main) {
                             it.contents.isNotEmpty() -> {
                                 contentRecyclerAdapter.submitList(it.contents)
                             }
-                            else -> {
-                                dataState.stateMessage?.message?.let { msg -> displayToast(msg) }
-                                contentRecyclerAdapter.submitList(it.contents)
+                            it.contents.isEmpty() -> {
+                                val toastMsg = getString(R.string.empty_results)
+                                displayToast(toastMsg)
                             }
                         }
                     }
@@ -82,6 +87,9 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
                 is DataState.ERROR -> {
                     displayProgressBar(dataState.loading)
+                    dataState.stateMessage?.message?.let {
+                        displayToast(it)
+                    }
                 }
             }
         })
@@ -110,6 +118,11 @@ class MainFragment: Fragment(R.layout.fragment_main) {
             adapter = contentRecyclerAdapter
         }
 
+        initTopAppBar()
+        initMenus()
+    }
+
+    private fun initTopAppBar() {
         val filterOpts = Media.values().filter {
             it != Media.ALL
         }.map {
@@ -130,18 +143,29 @@ class MainFragment: Fragment(R.layout.fragment_main) {
             val checkedFilter = lw.adapter.getItem(selection) as String
             selectedFilter = Media.fromString(checkedFilter)
 
-            viewModel.setStateEvent(MainIntent.GetContentsIntent(
-                searchView?.query.toString(),
-                selectedFilter
-            ))
+            /*
+             * If filter changed then only refresh list if search text is not empty. This
+             * is to avoid returning empty list as ITunes search API returns empty list for
+             * blank 'term' query parameter.
+             */
 
-            dialog.dismiss();
+            if (searchView?.query.toString().isNotEmpty()) {
+                viewModel.setStateEvent(
+                    MainIntent.GetContentsIntent(
+                        searchView?.query.toString(),
+                        selectedFilter
+                    )
+                )
+            }
+
+            dialog.dismiss()
         }
 
         val filterListDiag = MaterialAlertDialogBuilder(this.requireContext())
             .setTitle(resources.getString(R.string.menu_filter_list))
             .setSingleChoiceItems(singleItems, checkedItem(), filterListDiagCallback)
 
+        topAppBar = this.requireActivity().findViewById(R.id.topAppBar)
         topAppBar.navigationIcon = null
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -157,20 +181,27 @@ class MainFragment: Fragment(R.layout.fragment_main) {
                 else -> false
             }
         }
+    }
 
+    private fun initMenus() {
         val searchItem = topAppBar.menu.findItem(R.id.action_search)
         if (searchItem != null) {
             searchView = searchItem.actionView as SearchView
         }
 
-        if (searchView != null) {
-            searchView!!.setOnQueryTextListener(
+        searchView?.let { it ->
+            it.setOnQueryTextListener(
                 DebouncingQueryTextListener(
                     this.lifecycle
                 ) { newText ->
-                    newText?.let {
-                        if (it.isNotEmpty()) {
-                            viewModel.setStateEvent(MainIntent.GetContentsIntent(it, selectedFilter))
+                    newText?.let { txt ->
+                        if (txt.isNotEmpty()) {
+                            viewModel.setStateEvent(
+                                MainIntent.GetContentsIntent(
+                                    txt,
+                                    selectedFilter
+                                )
+                            )
                         }
                     }
                 }
@@ -185,10 +216,8 @@ internal class DebouncingQueryTextListener(
     private val onDebouncingQueryTextChange: (String?) -> Unit
 ) : SearchView.OnQueryTextListener {
 
-    var debouncePeriod: Long = 1000
-
+    private var debouncePeriod: Long = 1000
     private val coroutineScope = lifecycle.coroutineScope
-
     private var searchJob: Job? = null
 
     override fun onQueryTextSubmit(query: String?): Boolean {

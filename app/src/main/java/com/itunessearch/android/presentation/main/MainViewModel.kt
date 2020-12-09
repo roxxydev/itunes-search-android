@@ -1,4 +1,4 @@
-package com.itunessearch.android.presentation
+package com.itunessearch.android.presentation.main
 
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
@@ -7,10 +7,12 @@ import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.repository.MainRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class MainViewModel
 @ViewModelInject
 constructor(
@@ -31,8 +33,8 @@ constructor(
 
                 is MainIntent.GetInitialContentsIntent -> {
 
-                    val termSearch = intent.term?.let { it } ?: ""
-                    val mediaType = intent.media?.let { it } ?: Media.ALL
+                    val termSearch = intent.term ?: ""
+                    val mediaType = intent.media ?: Media.ALL
 
                     mainRepository.getContents(termSearch, mediaType)
                         .onEach { dataState ->
@@ -44,8 +46,8 @@ constructor(
 
                 is MainIntent.GetContentsIntent -> {
 
-                    val termSearch = intent.term?.let { it } ?: ""
-                    val mediaType = intent.media?.let { it } ?: Media.ALL
+                    val termSearch = intent.term ?: ""
+                    val mediaType = intent.media?: Media.ALL
 
                     mainRepository.getContents(termSearch, mediaType)
                         .onEach { dataState ->
@@ -70,8 +72,6 @@ sealed class MainIntent {
 
 class MainDataState(
     var isInitial: Boolean?,
-    val filter: Media?,
-    val queryText: String?,
     val contents: List<Content>,
     val cacheContents: List<Content>
 )
