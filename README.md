@@ -4,7 +4,7 @@ The project is written in Kotlin following MVI/MVVM design pattern. The app cons
 
 <img src="/output/app-preview.gif" width="30%"/>
 
-![Download](/output/itunes-search-androd_1.0.0.apk?raw=true "")
+![Download](/output/itunes-search-android_debug_1.0.0_1.apk?raw=true "")
 
 ### Design Pattern
 The project used MVI and Repository design pattern approach. State in app is defined by user's action which is called intent _(not the android Intent class)_ which the ViewModel will get and decide the state to be reflected to the View.

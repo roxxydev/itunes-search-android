@@ -47,6 +47,17 @@ android {
     }
 }
 
+// Rename output apk e.g. itunes-search-android_debug_1.0.0_1.apk
+android.applicationVariants.all { variant ->
+    variant.outputs.all { output ->
+        def baseName = "itunes-search-android"
+        def builtType = variant.buildType.name
+        def versionName = variant.versionName
+        def versionCode = variant.versionCode
+        outputFileName = "${baseName}_${builtType}_${versionName}_${versionCode}.apk"
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
