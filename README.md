@@ -2,8 +2,9 @@
 
 The project is written in Kotlin following MVI/MVVM design pattern. The app consumes the Search API of ITunes store for searching content like movies, books, podcasts, music, music videos, audiobooks, and TV shows within ITunes Store.
 
-![Alt text](/output/app-preview.gif?raw=true "")
-![Download APK](/output/itunes-search-androd_1.0.0-.apk?raw=true "")
+<img src="/output/app-preview.gif" width="30%"/>
+
+![Download](/output/itunes-search-androd_1.0.0-.apk?raw=true "")
 
 ### Design Pattern
 The project used MVI and Repository design pattern approach. State in app is defined by user's action which is called intent _(not the android Intent class)_ which the ViewModel will get and decide the state to be reflected to the View.
