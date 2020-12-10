@@ -112,6 +112,7 @@ class MainFragment: Fragment(R.layout.fragment_main) {
                 true -> View.VISIBLE
                 else -> View.GONE
             }
+            appPrefs.isFirstUse = false
         }
         else {
             tvEmptyMsg.visibility = View.GONE
