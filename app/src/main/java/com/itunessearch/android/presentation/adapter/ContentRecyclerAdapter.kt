@@ -14,7 +14,9 @@ import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.presentation.UiUtil
 import com.itunessearch.android.presentation.detail.DetailFragment
 import kotlinx.android.synthetic.main.content_list_item.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<Content> = ArrayList()

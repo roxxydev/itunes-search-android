@@ -49,15 +49,13 @@ constructor(
                 is ResultWrapper.Success<EntityNetworkSearchRes> -> {
 
                     val networkData = response.value
-                    var contentsNetwork: List<Content> = networkData.let {
+                    val contentsNetwork: List<Content> = networkData.let {
                         contentMapper.mapFromNetworkEntitySearchRes(it)
                     }
 
-                    val entityCacheContentsList: List<EntityCacheContent>? =
-                        contentMapper.mapToCacheEntityList(contentsNetwork) as List<EntityCacheContent>
-                    entityCacheContentsList?.let {
-                        daoContent.upsert(it)
-                    }
+                    val entityCacheContentsList =
+                        contentMapper.mapToCacheEntityList(contentsNetwork)
+                    daoContent.upsert(entityCacheContentsList as List<EntityCacheContent>)
 
                     val cacheData = daoContent.getAll()
                     val contentsCache = contentMapper.mapFromCacheEntityList(cacheData)

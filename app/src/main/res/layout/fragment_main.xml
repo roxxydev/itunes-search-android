@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:text="@string/label_search_any_keyword"
         android:layout_gravity="center"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_recyclerview"

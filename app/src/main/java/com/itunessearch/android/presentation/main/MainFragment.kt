@@ -45,12 +45,17 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
         initViews()
         subscribeObservers()
-        viewModel.setStateEvent(
-            MainIntent.GetInitialContentsIntent(
-                null,
-                null
+
+        if (!appPrefs.isFirstUse) {
+            viewModel.setStateEvent(
+                MainIntent.GetInitialContentsIntent(
+                    null,
+                    null
+                )
             )
-        )
+        }
+
+        appPrefs.isFirstUse = false
     }
 
     private fun subscribeObservers() {
@@ -73,13 +78,16 @@ class MainFragment: Fragment(R.layout.fragment_main) {
                         when {
                             isInitialLoad -> {
                                 contentRecyclerAdapter.submitList(it.cacheContents)
+                                displayTextViewEmpty(it.cacheContents.isEmpty())
                             }
                             it.contents.isNotEmpty() -> {
                                 contentRecyclerAdapter.submitList(it.contents)
+                                displayTextViewEmpty(false)
                             }
                             it.contents.isEmpty() -> {
                                 val toastMsg = getString(R.string.empty_results)
                                 displayToast(toastMsg)
+                                displayTextViewEmpty(it.cacheContents.isEmpty())
                             }
                         }
                     }
@@ -98,7 +106,9 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
                     // If no network on application start then display cache data
                     dataState.data?.isInitial?.let {
-                        contentRecyclerAdapter.submitList(dataState.data?.cacheContents ?: emptyList())
+                        val cacheContents = dataState.data?.cacheContents ?: emptyList()
+                        contentRecyclerAdapter.submitList(cacheContents)
+                        displayTextViewEmpty(cacheContents.isEmpty())
                     }
                 }
             }
@@ -107,15 +117,9 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
     // Only display label on first time use of app
     private fun displayTextViewEmpty(isDisplayed: Boolean) {
-        if (appPrefs.isFirstUse) {
-            tvEmptyMsg.visibility = when(isDisplayed) {
-                true -> View.VISIBLE
-                else -> View.GONE
-            }
-            appPrefs.isFirstUse = false
-        }
-        else {
-            tvEmptyMsg.visibility = View.GONE
+        tvEmptyMsg.visibility = when(isDisplayed) {
+            true -> View.VISIBLE
+            else -> View.GONE
         }
     }
 
@@ -146,10 +150,6 @@ class MainFragment: Fragment(R.layout.fragment_main) {
         initMenus()
 
         displayTextViewEmpty(true)
-
-        if (appPrefs.isFirstUse) {
-            appPrefs.isFirstUse = false
-        }
     }
 
     private fun initTopAppBar() {
