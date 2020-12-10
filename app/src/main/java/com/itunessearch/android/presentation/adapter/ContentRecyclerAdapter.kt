@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.navigation.Navigation
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.itunessearch.android.R
 import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.presentation.UiUtil
+import com.itunessearch.android.presentation.detail.DetailFragment
 import kotlinx.android.synthetic.main.content_list_item.view.*
 
 class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -80,7 +81,13 @@ class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             UiUtil.displayImage(itemView.context, content.artworkUrl100, ivImage)
 
             card.setOnClickListener {
-                Navigation.findNavController(itemView).navigate(R.id.action_mainFragment_to_detailFragment)
+                UiUtil.navigateTo(
+                    itemView,
+                    R.id.action_mainFragment_to_detailFragment,
+                    bundleOf(
+                        DetailFragment.ARGS_CONTENT_ID to content.id,
+                        DetailFragment.ARGS_CONTENT_TRACKID to content.trackId)
+                )
             }
         }
     }

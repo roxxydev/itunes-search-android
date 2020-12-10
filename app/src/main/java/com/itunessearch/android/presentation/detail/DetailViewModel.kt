@@ -32,7 +32,7 @@ constructor(
 
                 is DetailIntent.ShowContentDetail -> {
 
-                    mainRepository.getContent(intent.id)
+                    mainRepository.getContent(intent.id, intent.trackId)
                         .onEach { dataState ->
                             _dataState.value = dataState
                         }
@@ -45,7 +45,7 @@ constructor(
 
 sealed class DetailIntent {
 
-    data class ShowContentDetail(val id: String) : DetailIntent()
+    data class ShowContentDetail(val id: Int?, val trackId: Int?) : DetailIntent()
 }
 
 class DetailDataState(

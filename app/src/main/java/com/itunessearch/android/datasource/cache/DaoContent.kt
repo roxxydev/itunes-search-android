@@ -13,8 +13,8 @@ interface DaoContent:
     @Query("SELECT * FROM content ORDER BY id DESC LIMIT 50")
     suspend fun getAll(): List<EntityCacheContent>
 
-    @Query("SELECT * FROM content ORDER BY id DESC LIMIT 1")
-    suspend fun get(): EntityCacheContent
+    @Query("SELECT * FROM content WHERE id=:id OR trackId=:trackId")
+    suspend fun get(id: Int?, trackId: Int?): EntityCacheContent
 
     @Transaction
     suspend fun upsert(obj: EntityCacheContent) {

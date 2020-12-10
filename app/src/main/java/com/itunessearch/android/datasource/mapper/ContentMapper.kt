@@ -18,6 +18,7 @@ constructor(): MapperEntity<EntityModel, Content> {
         val entityCache = entityModel as EntityCacheContent
 
         return Content(
+            id = entityCache.id?.let { it.toInt() },
             wrapperType = WrapperType.fromString(entityCache.wrapperType),
             kind = Kind.fromString(entityCache.kind),
             collectionId = entityCache.collectionId,
@@ -114,6 +115,7 @@ constructor(): MapperEntity<EntityModel, Content> {
         val entityNetworkContent = entityModel as EntityNetworkContent
 
         return Content(
+            id = null,
             wrapperType = WrapperType.fromString(entityNetworkContent.wrapperType),
             kind = Kind.fromString(entityNetworkContent.kind),
             collectionId = entityNetworkContent.collectionId,
@@ -160,6 +162,7 @@ constructor(): MapperEntity<EntityModel, Content> {
         return entityNetworkSearchRes.results.map {
             val entityNetworkContent = it
             Content(
+                id = null,
                 wrapperType = WrapperType.fromString(entityNetworkContent.wrapperType),
                 kind = Kind.fromString(entityNetworkContent.kind),
                 collectionId = entityNetworkContent.collectionId,

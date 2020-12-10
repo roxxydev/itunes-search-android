@@ -100,10 +100,10 @@ constructor(
     /**
      * Return the details of a Content from cache data.
      */
-    suspend fun getContent(id: String): Flow<DataState<DetailDataState>> = flow {
+    suspend fun getContent(id: Int?, trackId: Int?): Flow<DataState<DetailDataState>> = flow {
         try {
             emit(LOADING(true))
-            val cacheData = daoContent.get()
+            val cacheData = daoContent.get(id, trackId)
             val content = contentMapper.mapFromCacheEntity(cacheData)
             emit(SUCCESS(DetailDataState(content)))
             emit(LOADING(false))

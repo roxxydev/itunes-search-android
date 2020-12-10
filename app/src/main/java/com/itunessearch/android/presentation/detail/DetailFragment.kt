@@ -22,12 +22,20 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
 
     private val viewModel: MainViewModel by  viewModels()
 
+    companion object {
+        val ARGS_CONTENT_ID = "content_id"
+        val ARGS_CONTENT_TRACKID = "content_track_id"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initViews();
         subscribeObservers()
-        viewModel.setStateEvent(DetailIntent.ShowContentDetail(""))
+
+        val id = arguments?.getInt(ARGS_CONTENT_ID)
+        val trackId = arguments?.getInt(ARGS_CONTENT_TRACKID)
+        viewModel.setStateEvent(DetailIntent.ShowContentDetail(id, trackId))
     }
 
     private fun subscribeObservers() {

@@ -1,9 +1,11 @@
 package com.itunessearch.android.presentation
 
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.itunessearch.android.domain.model.Content
 import java.text.SimpleDateFormat
@@ -13,6 +15,18 @@ class UiUtil {
 
     companion object {
 
+        /**
+         * Helper method for navigating between fragments in NavigationHost.
+         */
+        fun navigateTo(navControllerView: View, action: Int, bundle: Bundle?) {
+            Navigation
+                .findNavController(navControllerView)
+                .navigate(action, bundle)
+        }
+
+        /**
+         * Assign display values to TextViews base from Content model object.
+         */
         fun setContentTextValues(
             content: Content,
             tvName: TextView,
@@ -61,6 +75,9 @@ class UiUtil {
             }
         }
 
+        /**
+         * Helper method for displaying and loading image to ImageView using Glide.
+         */
         fun displayImage(context: Context, imgUrl: String?, imageView: ImageView) {
             Glide.with(context)
                 .load(imgUrl)

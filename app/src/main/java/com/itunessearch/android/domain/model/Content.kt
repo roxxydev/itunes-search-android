@@ -7,6 +7,7 @@ package com.itunessearch.android.domain.model
  */
 
 data class Content (
+    var id: Int?,
     var wrapperType: WrapperType?,
     var kind: Kind?,
     var collectionId: Int?,
