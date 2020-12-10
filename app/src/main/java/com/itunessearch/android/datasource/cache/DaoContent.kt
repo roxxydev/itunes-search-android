@@ -1,6 +1,8 @@
 package com.itunessearch.android.datasource.cache
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Transaction
 import com.itunessearch.android.datasource.model.EntityCacheContent
 
 @Dao

@@ -3,6 +3,7 @@ package com.itunessearch.android.presentation.detail
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -11,8 +12,11 @@ import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.presentation.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_detail.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class DetailFragment: Fragment(R.layout.fragment_detail) {
 
@@ -21,6 +25,7 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViews();
         subscribeObservers()
         viewModel.setStateEvent(DetailIntent.ShowContentDetail(""))
     }
@@ -52,10 +57,6 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
-//        progress_bar.visibility = when(isDisplayed) {
-//            true -> View.VISIBLE
-//            else -> View.GONE
-//        }
     }
 
     private fun displayToast(message: String) {
@@ -73,5 +74,12 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
             tvDescription
         )
         UiUtil.displayImage(this.requireContext(), content.artworkUrl100, image)
+    }
+
+    private fun initViews() {
+        topAppBar.navigationIcon = ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_arrow_back)
+        topAppBar.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
     }
 }

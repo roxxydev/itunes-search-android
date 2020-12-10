@@ -6,17 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.card.MaterialCardView
 import com.itunessearch.android.R
 import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.presentation.UiUtil
 import kotlinx.android.synthetic.main.content_list_item.view.*
-import kotlin.collections.ArrayList
 
 class ContentRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

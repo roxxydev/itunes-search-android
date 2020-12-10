@@ -4,13 +4,14 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.itunessearch.android.domain.model.Content
-import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.repository.MainRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class MainViewModel
 @ViewModelInject
 constructor(

@@ -4,6 +4,8 @@
     <string name="error_message">Oops! Something went wrong.</string>
     <string name="empty_results">No result found</string>
 
+    <string name="dialog_filter_title">Set Search Filter</string>
+
     <string name="menu_search">Search</string>
     <string name="menu_filter_list">Filter</string>
 </resources>

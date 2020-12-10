@@ -13,13 +13,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itunessearch.android.R
 import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.presentation.adapter.ContentRecyclerAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -32,7 +32,6 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
     private val viewModel: MainViewModel by  viewModels()
     private lateinit var contentRecyclerAdapter: ContentRecyclerAdapter
-    private lateinit var topAppBar: MaterialToolbar
     private var searchView: SearchView? = null
     private var selectedFilter: Media = Media.ALL
 
@@ -165,7 +164,7 @@ class MainFragment: Fragment(R.layout.fragment_main) {
             .setTitle(resources.getString(R.string.menu_filter_list))
             .setSingleChoiceItems(singleItems, checkedItem(), filterListDiagCallback)
 
-        topAppBar = this.requireActivity().findViewById(R.id.topAppBar)
+        topAppBar.inflateMenu(R.menu.menu)
         topAppBar.navigationIcon = null
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {

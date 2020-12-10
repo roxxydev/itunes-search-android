@@ -3,8 +3,10 @@ package com.itunessearch.android.presentation.main
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import com.itunessearch.android.presentation.detail.DetailFragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class MainFragmentFactory
 @Inject
 constructor(): FragmentFactory() {

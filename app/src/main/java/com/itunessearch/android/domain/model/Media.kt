@@ -1,7 +1,5 @@
 package com.itunessearch.android.domain.model
 
-import timber.log.Timber
-
 enum class Media(val value: String) {
 
     MOVIE("movie"),

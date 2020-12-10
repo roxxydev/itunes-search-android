@@ -1,7 +1,7 @@
 package com.itunessearch.android.datasource.mapper
 
-import com.itunessearch.android.datasource.model.EntityModel
 import com.itunessearch.android.datasource.model.EntityCacheContent
+import com.itunessearch.android.datasource.model.EntityModel
 import com.itunessearch.android.datasource.model.EntityNetworkContent
 import com.itunessearch.android.datasource.model.EntityNetworkSearchRes
 import com.itunessearch.android.domain.model.Content

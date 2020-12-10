@@ -13,12 +13,11 @@ import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.domain.state.DataState.*
 import com.itunessearch.android.domain.state.MessageType
 import com.itunessearch.android.domain.state.StateMessage
-import com.itunessearch.android.presentation.main.MainDataState
 import com.itunessearch.android.presentation.detail.DetailDataState
+import com.itunessearch.android.presentation.main.MainDataState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
-import java.lang.Exception
 
 class  MainRepository
 constructor(
