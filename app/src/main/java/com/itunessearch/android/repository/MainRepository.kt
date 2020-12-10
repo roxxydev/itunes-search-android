@@ -6,7 +6,10 @@ import com.itunessearch.android.R
 import com.itunessearch.android.datasource.cache.DaoContent
 import com.itunessearch.android.datasource.mapper.ContentMapper
 import com.itunessearch.android.datasource.model.EntityCacheContent
+import com.itunessearch.android.datasource.model.EntityNetworkSearchRes
 import com.itunessearch.android.datasource.network.ApiServiceRetrofit
+import com.itunessearch.android.datasource.network.ResultWrapper
+import com.itunessearch.android.datasource.network.safeApiCall
 import com.itunessearch.android.domain.model.Content
 import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
@@ -34,24 +37,55 @@ constructor(
      * @param term The text to search in ITunes Search API.
      * @param media The type of Media to fetch.
      */
-    suspend fun getContents(term: String, media: Media): Flow<DataState<MainDataState>> = flow {
+    suspend fun getContents(isInitial: Boolean, term: String, media: Media): Flow<DataState<MainDataState>> = flow {
         try {
             emit(LOADING(true))
 
-            val networkData = apiService.get(BuildConfig.DEFAULT_COUNTRY_CODE, term, media)
-            val contentsNetwork: List<Content> = contentMapper.mapFromNetworkEntitySearchRes(networkData)
+            val response = safeApiCall { 
+                apiService.get(BuildConfig.DEFAULT_COUNTRY_CODE, term, media)
+            }
 
-            daoContent.upsert(contentMapper.mapToCacheEntityList(contentsNetwork) as List<EntityCacheContent>)
+            when(response) {
+                is ResultWrapper.Success<EntityNetworkSearchRes> -> {
 
-            val cacheData = daoContent.getAll()
-            val contentsCache = contentMapper.mapFromCacheEntityList(cacheData)
+                    val networkData = response.value
+                    var contentsNetwork: List<Content> = networkData.let {
+                        contentMapper.mapFromNetworkEntitySearchRes(it)
+                    }
 
-            emit(SUCCESS(
-                MainDataState(
-                    null,
-                    contentsNetwork,
-                    contentsCache)
-            ))
+                    val entityCacheContentsList: List<EntityCacheContent>? =
+                        contentMapper.mapToCacheEntityList(contentsNetwork) as List<EntityCacheContent>
+                    entityCacheContentsList?.let {
+                        daoContent.upsert(it)
+                    }
+
+                    val cacheData = daoContent.getAll()
+                    val contentsCache = contentMapper.mapFromCacheEntityList(cacheData)
+
+                    emit(SUCCESS(
+                        MainDataState(
+                            isInitial,
+                            contentsNetwork,
+                            contentsCache)
+                    ))
+                }
+                else -> {
+                    // Emit error with message if network issue or error response
+                    val errorTxt = appContext.getString(R.string.error_network)
+                    val stateMsg = StateMessage(errorTxt, MessageType.ERROR)
+
+                    val cacheData = daoContent.getAll()
+                    val contentsCache = contentMapper.mapFromCacheEntityList(cacheData)
+
+                    emit(ERROR(stateMsg,
+                        MainDataState(
+                            isInitial,
+                            emptyList(),
+                            contentsCache)
+                        )
+                    )
+                }
+            }
 
             emit(LOADING(false))
 

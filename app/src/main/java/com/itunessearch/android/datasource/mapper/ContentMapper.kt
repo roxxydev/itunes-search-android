@@ -158,7 +158,7 @@ constructor(): MapperEntity<EntityModel, Content> {
     fun mapFromNetworkEntitySearchRes(entityNetworkSearchRes: EntityNetworkSearchRes): List<Content> {
 
         return entityNetworkSearchRes.results.map {
-            val entityNetworkContent = it as EntityNetworkContent
+            val entityNetworkContent = it
             Content(
                 wrapperType = WrapperType.fromString(entityNetworkContent.wrapperType),
                 kind = Kind.fromString(entityNetworkContent.kind),

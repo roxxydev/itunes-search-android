@@ -15,6 +15,7 @@ import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.itunessearch.android.R
+import com.itunessearch.android.datasource.preference.AppPrefs
 import com.itunessearch.android.domain.model.Media
 import com.itunessearch.android.domain.state.DataState
 import com.itunessearch.android.presentation.adapter.ContentRecyclerAdapter
@@ -25,14 +26,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainFragment: Fragment(R.layout.fragment_main) {
 
+    @Inject
+    lateinit var appPrefs: AppPrefs
+
     private val viewModel: MainViewModel by  viewModels()
     private lateinit var contentRecyclerAdapter: ContentRecyclerAdapter
-    private var searchView: SearchView? = null
+    private lateinit var searchView: SearchView
     private var selectedFilter: Media = Media.ALL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,12 +91,31 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
                 is DataState.ERROR -> {
                     displayProgressBar(dataState.loading)
+
                     dataState.stateMessage?.message?.let {
                         displayToast(it)
+                    }
+
+                    // If no network on application start then display cache data
+                    dataState.data?.isInitial?.let {
+                        contentRecyclerAdapter.submitList(dataState.data?.cacheContents ?: emptyList())
                     }
                 }
             }
         })
+    }
+
+    // Only display label on first time use of app
+    private fun displayTextViewEmpty(isDisplayed: Boolean) {
+        if (appPrefs.isFirstUse) {
+            tvEmptyMsg.visibility = when(isDisplayed) {
+                true -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+        else {
+            tvEmptyMsg.visibility = View.GONE
+        }
     }
 
     private fun displayProgressBar(isDisplayed: Boolean) {
@@ -119,6 +143,12 @@ class MainFragment: Fragment(R.layout.fragment_main) {
 
         initTopAppBar()
         initMenus()
+
+        displayTextViewEmpty(true)
+
+        if (appPrefs.isFirstUse) {
+            appPrefs.isFirstUse = false
+        }
     }
 
     private fun initTopAppBar() {
@@ -148,10 +178,10 @@ class MainFragment: Fragment(R.layout.fragment_main) {
              * blank 'term' query parameter.
              */
 
-            if (searchView?.query.toString().isNotEmpty()) {
+            if (searchView.query.toString().isNotEmpty()) {
                 viewModel.setStateEvent(
                     MainIntent.GetContentsIntent(
-                        searchView?.query.toString(),
+                        searchView.query.toString(),
                         selectedFilter
                     )
                 )
@@ -188,24 +218,22 @@ class MainFragment: Fragment(R.layout.fragment_main) {
             searchView = searchItem.actionView as SearchView
         }
 
-        searchView?.let { it ->
-            it.setOnQueryTextListener(
-                DebouncingQueryTextListener(
-                    this.lifecycle
-                ) { newText ->
-                    newText?.let { txt ->
-                        if (txt.isNotEmpty()) {
-                            viewModel.setStateEvent(
-                                MainIntent.GetContentsIntent(
-                                    txt,
-                                    selectedFilter
-                                )
+        searchView.setOnQueryTextListener(
+            DebouncingQueryTextListener(
+                this.lifecycle
+            ) { newText ->
+                newText?.let { txt ->
+                    if (txt.isNotEmpty()) {
+                        viewModel.setStateEvent(
+                            MainIntent.GetContentsIntent(
+                                txt,
+                                selectedFilter
                             )
-                        }
+                        )
                     }
                 }
-            )
-        }
+            }
+        )
     }
 }
 

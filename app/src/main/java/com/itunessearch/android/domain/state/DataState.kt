@@ -23,10 +23,11 @@ sealed class DataState<T>(
     )
 
     class ERROR<T>(
-        stateMessage: StateMessage
+        stateMessage: StateMessage,
+        cachedData: T? = null
     ) : DataState<T>(
         loading = false,
-        data = null,
+        data = cachedData,
         stateMessage = stateMessage
     )
 }

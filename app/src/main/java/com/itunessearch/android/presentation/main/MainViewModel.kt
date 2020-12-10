@@ -36,7 +36,7 @@ constructor(
                     val termSearch = intent.term ?: ""
                     val mediaType = intent.media ?: Media.ALL
 
-                    mainRepository.getContents(termSearch, mediaType)
+                    mainRepository.getContents(true, termSearch, mediaType)
                         .onEach { dataState ->
                             dataState.data?.isInitial = true
                             _dataState.value = dataState
@@ -49,7 +49,7 @@ constructor(
                     val termSearch = intent.term ?: ""
                     val mediaType = intent.media?: Media.ALL
 
-                    mainRepository.getContents(termSearch, mediaType)
+                    mainRepository.getContents(false, termSearch, mediaType)
                         .onEach { dataState ->
                             dataState.data?.isInitial = false
                             _dataState.value = dataState

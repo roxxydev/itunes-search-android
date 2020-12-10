@@ -1,11 +1,8 @@
 package com.itunessearch.android.di
 
 import android.util.Log
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.itunessearch.android.BuildConfig
 import com.itunessearch.android.datasource.network.ApiServiceRetrofit
-import com.itunessearch.android.datasource.network.EnumConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,19 +10,13 @@ import dagger.hilt.android.components.ApplicationComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
 @InstallIn(ApplicationComponent::class)
 object NetworkModule {
-
-    @Singleton
-    @Provides
-    fun providesGsonBuilder(): Gson {
-        return GsonBuilder().create()
-    }
 
     @Singleton
     @Provides
@@ -40,8 +31,7 @@ object NetworkModule {
                 if (priority == Log.VERBOSE || priority == Log.DEBUG) {
                     return
                 }
-                val t =
-                    throwable ?: Exception(message)
+                // val t = throwable ?: Exception(message)
                 // Pass the exception variable t to crash reporting service
             }
         }
@@ -73,12 +63,11 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofitBuilder(okHttpClient: OkHttpClient, gson: Gson): Retrofit.Builder {
+    fun provideRetrofitBuilder(okHttpClient: OkHttpClient): Retrofit.Builder {
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(BuildConfig.API_HOST)
-            .addConverterFactory(EnumConverterFactory())
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(MoshiConverterFactory.create())
     }
 
     @Singleton

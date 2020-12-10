@@ -34,29 +34,18 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
 
             when(dataState) {
-
                 is DataState.SUCCESS<DetailDataState> -> {
-                    displayProgressBar(false)
                     dataState.data?.let {
                         displayContentDetails(it.content)
                     }
                 }
-
-                is DataState.LOADING -> {
-                    displayProgressBar(dataState.loading)
-                }
-
                 is DataState.ERROR -> {
-                    displayProgressBar(dataState.loading)
                     dataState.stateMessage?.message?.let {
                         displayToast(it)
                     }
                 }
             }
         })
-    }
-
-    private fun displayProgressBar(isDisplayed: Boolean) {
     }
 
     private fun displayToast(message: String) {

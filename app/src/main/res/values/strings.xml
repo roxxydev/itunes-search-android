@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">ITunes Search</string>
 
+    <string name="label_search_any_keyword">
+        Hello there!\n
+        Try searching any keyword to display results.
+    </string>
+
+    <string name="error_network">
+        No internet connection. Check your connection and try again.
+    </string>
     <string name="error_message">Oops! Something went wrong.</string>
     <string name="empty_results">No result found</string>
 
